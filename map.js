@@ -178,7 +178,17 @@ var loadGeoJson = function(){
 		onEachFeature: onEachFeature
 	}).addTo(map);
 
-	geojson.resetStyle({});
+
+	safePassageGeojson = L.geoJson(safePassage, {
+		style: {
+			weight: 1,
+			opacity: 1,
+			color: 'black',
+			fillOpacity: 0.8,
+			fillColor: 'yellow'
+		}
+	}).addTo(map);
+
 	map.attributionControl.addAttribution('Alcohol data &copy; <a href="#">ABC</a>');
 }
 
