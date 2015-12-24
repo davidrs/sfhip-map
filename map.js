@@ -58,13 +58,12 @@ info.onAdd = function (map) {
 };
 
 info.update = function (props) {
-	//console.log(props)
 	this._div.innerHTML = '<h4>Off Site Aclohol Licenses</h4>' +  (props ?
 		'<b>Census Tract: ' + props.TRACT + '</b><br />' 
-		+ props.offSiteActual + ' actual<br />'
-		+ props.offSiteQuota + ' quota<br />'
+		+ '<b>' + prettyRound(props.offSiteRatio) + '% of authorized #</b><br />'
+		+ props.offSiteActual + ' actual #<br />'
+		+ props.offSiteQuota + ' authorized #<br />'
 		+ props.offSiteDelta + ' quota - actual<br />'
-		+ prettyRound(props.offSiteRatio) + ' actual/quota<br />'
 		: 'Hover over an area');
 };
 
@@ -73,11 +72,9 @@ info.addTo(map);
 
 // get color for each census tract.
 function getColor(d) {
-	return d > 3 ? '#800026' :
-	       d > 2.5  ? '#BD0026' :
-	       d > 2.0  ? '#E31A1C' :
-	       d > 1.5  ? '#FC4E2A' :
-	       d > 1.0  ? '#FD8D3C' :
+	return d > 1.5 ? '#800026' :
+	       d >= 1.01  ? '#FC4E2A' :
+	       d >= 1.0  ? '#FDFD3C' :
 	       d > 0.5   ? '#D9FE76' :
 	       d >= 0.0   ? '#B2FE4C' :
 	                  '#EEE';
@@ -148,13 +145,13 @@ function onEachFeature(feature, layer) {
 
 // Pretty round a # to 2 decimal digits.
 var prettyRound = function(number){
-	return Math.round(number * 100)/100;
+	return Math.round(number * 100);
 }
 
 var legend = L.control({position: 'bottomright'});
 legend.onAdd = function (map) {
 	var div = L.DomUtil.create('div', 'info legend'),
-		grades = [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0],
+		grades = [0, 0.5, 1.0, 1.01, 1.5],
 		labels = [],
 		from, to;
 
@@ -164,10 +161,10 @@ legend.onAdd = function (map) {
 
 		labels.push(
 			'<i style="background:' + getColor(from+ 0.001) + '"></i> ' +
-			from + (to ? '&ndash;' + to : '+'));
+			prettyRound(from) + (from==1 ? '': (to ? '&ndash;' + prettyRound(to) : '+'))+'%');
 	}
-
-	div.innerHTML = labels.join('<br>');
+ 	div.innerHTML = "<strong>actual licenses / approved #</strong><br />"
+	div.innerHTML += labels.join('<br>');
 	return div;
 };
 	legend.addTo(map);
