@@ -96,7 +96,7 @@ function style(feature) {
 		opacity: 1,
 		color: 'white',
 		dashArray: '3',
-		fillOpacity: 0.7,
+		fillOpacity: 0.6,
 		fillColor: getColor(combinedData[censusTract].offSiteActual/combinedData[censusTract].offSiteQuota)
 	};
 }
