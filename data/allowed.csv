@@ -1,4 +1,4 @@
-County Name ,County Population ,County Ratio On Sale ,County Ratio Off Sale ,Census Tract # ,Census Tract Population ,On Sale ,Off Sale 
+County Name ,County Population ,County Ratio On Sale ,County Ratio Off Sale ,censusTract,Census Tract Population ,On Sale,Off Sale 
 SAN FRANCISCO ,836620,286,1026,101,3739,13,3
 SAN FRANCISCO ,836620,286,1026,102,4143,14,4
 SAN FRANCISCO ,836620,286,1026,103,3852,13,3

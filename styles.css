@@ -28,3 +28,14 @@
 	margin-right: 8px;
 	opacity: 0.7;
 }
+
+.map-type{
+	cursor: pointer;
+	padding: 4px 8px;
+	background-color: #eee;
+	border-radius: 2px;
+	float:left;
+	margin-right: 5px;
+	font-family: Roboto;
+	font-size: 15px;
+}

@@ -1,36 +1,69 @@
 var ALLOWED_LICENSES_CSV = "data/allowed.csv";
 var ACTUAL_LICENSES_CSV = "data/actual.csv";
-// Keyed off of census tract, has offSiteQuota: #, offSiteActual#:
+
+var CENSUS_TRACT_COL = "censusTract";
+
+// Keyed off of census tract, has offSite.quota: #, offSite.actual#:
 var combinedData = {};
 
+// TODO: variable for on site license codes: 20 and 21
+
+// TODO: variable for off site license codes
+var OFFSITE_LABEL = "offSite";
+var ONSITE_LABEL = "onSite";
+var currentView = OFFSITE_LABEL;
+
+
 var bothCsvsDone = false;
+
+
+
+var changeView = function(label){
+	currentView = label;
+	geojson.setStyle(style);
+}
+
 
 var loadCSVs = function(){
 	allowedLicenseCounts = d3.csv(ALLOWED_LICENSES_CSV, function(rows){
 		rows.forEach(function(d){
-			censusTract = Math.round(+d["Census Tract # "] * 100)
+			censusTract = Math.round(+d[CENSUS_TRACT_COL] * 100)
 			if (!combinedData[censusTract]){
-				combinedData[censusTract] = {}
+				combinedData[censusTract] = {onSite:{}, offSite:{}};
 			}
-			combinedData[censusTract].offSiteQuota = +d["Off Sale "];
+			combinedData[censusTract].offSite.quota = +d["Off Sale "];
+			combinedData[censusTract].onSite.quota = +d["On Sale"];
 		});
 		actualLicenseCounts = d3.csv(ACTUAL_LICENSES_CSV, function(rows){
 			rows.forEach(function(d){
-				if (!combinedData[d["Census_tra"]]){
-					combinedData[d["Census_tra"]] = {}
+				if (!combinedData[d[CENSUS_TRACT_COL]]){
+					combinedData[d[CENSUS_TRACT_COL]] = {onSite:{}, offSite:{}};
 				}
 				if (d["License_Ty"] == "20" || d["License_Ty"] == "21"){
-					if (!combinedData[d["Census_tra"]].offSiteActual){
-						combinedData[d["Census_tra"]].offSiteActual = +d["n_stores"];
+					if (!combinedData[d[CENSUS_TRACT_COL]].offSite.actual){
+						combinedData[d[CENSUS_TRACT_COL]].offSite.actual = +d["n_stores"];
 					} else {
-						combinedData[d["Census_tra"]].offSiteActual += +d["n_stores"];
+						combinedData[d[CENSUS_TRACT_COL]].offSite.actual += +d["n_stores"];
 					}
-				} else {
-					// Not an offsite one, but this means we have data for the tract, so should count 0;
-					if (!combinedData[d["Census_tra"]].offSiteActual){
-						combinedData[d["Census_tra"]].offSiteActual = 0;
+				} else if (d["License_Ty"] == "48"){ // On site licenses, type 48.
+					if (!combinedData[d[CENSUS_TRACT_COL]].onSite.actual){
+						combinedData[d[CENSUS_TRACT_COL]].onSite.actual = +d["n_stores"];
+					} else {
+						combinedData[d[CENSUS_TRACT_COL]].onSite.actual += +d["n_stores"];
 					}
+					
 				}
+
+
+				// We have data for the tract, so should count 0 instead of undefined.
+				if (!combinedData[d[CENSUS_TRACT_COL]].offSite.actual){
+					combinedData[d[CENSUS_TRACT_COL]].offSite.actual = 0;
+				}
+				if (!combinedData[d[CENSUS_TRACT_COL]].onSite.actual){
+					combinedData[d[CENSUS_TRACT_COL]].onSite.actual = 0;
+				}
+
+
 			});
 			loadGeoJson();
 		});
@@ -58,12 +91,20 @@ info.onAdd = function (map) {
 };
 
 info.update = function (props) {
-	this._div.innerHTML = '<h4>Off Site Aclohol Licenses</h4>' +  (props ?
-		'<b>Census Tract: ' + props.TRACT + '</b><br />' 
-		+ '<b>' + prettyRound(props.offSiteRatio) + '% of authorized #</b><br />'
-		+ props.offSiteActual + ' actual #<br />'
-		+ props.offSiteQuota + ' authorized #<br />'
-		+ props.offSiteDelta + ' quota - actual<br />'
+	if (!props || !props.censusTract){
+		return;
+	}
+	var tract = props.censusTract;
+	var label = "offSite";
+	if(currentView == ONSITE_LABEL) {
+		label = "onSite";
+	}
+	this._div.innerHTML = '<h4>'+label+' Aclohol Licenses</h4>' +  (props ?
+		'<b>Census Tract: ' + tract + '</b><br />' 
+		+ '<b>' + prettyRound(getRatio(tract, label)) + '% of authorized #</b><br />'
+		+ combinedData[tract][label].actual + ' actual #<br />'
+		+ combinedData[tract][label].quota + ' authorized #<br />'
+		+ getDelta(tract,label) + ' quota - actual<br />'
 		: 'Hover over an area');
 };
 
@@ -97,7 +138,7 @@ function style(feature) {
 		color: 'white',
 		dashArray: '3',
 		fillOpacity: 0.6,
-		fillColor: getColor(combinedData[censusTract].offSiteActual/combinedData[censusTract].offSiteQuota)
+		fillColor: getColor(getRatio(censusTract, currentView))
 	};
 }
 
@@ -132,10 +173,7 @@ function zoomToFeature(e) {
 
 function onEachFeature(feature, layer) {
 	var censusTract = +feature.properties.TRACT;
-	feature.properties.offSiteQuota = combinedData[censusTract].offSiteQuota;
-	feature.properties.offSiteActual = combinedData[censusTract].offSiteActual;
-	feature.properties.offSiteRatio = combinedData[censusTract].offSiteActual / combinedData[censusTract].offSiteQuota;
-	feature.properties.offSiteDelta = combinedData[censusTract].offSiteQuota - combinedData[censusTract].offSiteActual;
+	feature.properties.censusTract = censusTract;
 	layer.on({
 		mouseover: highlightFeature,
 		mouseout: resetHighlight,
@@ -146,6 +184,14 @@ function onEachFeature(feature, layer) {
 // Pretty round a # to 2 decimal digits.
 var prettyRound = function(number){
 	return Math.round(number * 100);
+}
+
+var getRatio = function(censusTract, label){
+	return (combinedData[censusTract][label].actual / combinedData[censusTract][label].quota);
+}
+
+var getDelta = function(censusTract, label){
+	return (combinedData[censusTract][label].quota - combinedData[censusTract][label].actual);
 }
 
 var legend = L.control({position: 'bottomright'});
@@ -175,19 +221,25 @@ var loadGeoJson = function(){
 		onEachFeature: onEachFeature
 	}).addTo(map);
 
-
-	safePassageGeojson = L.geoJson(safePassage, {
-		style: {
-			weight: 1,
-			opacity: 1,
-			color: 'black',
-			fillOpacity: 0.8,
-			fillColor: 'yellow'
-		}
-	}).addTo(map);
+	// TODO: add safe passage geojson.
+	// safePassageGeojson = L.geoJson(safePassage, {
+	// 	style: {
+	// 		weight: 1,
+	// 		opacity: 1,
+	// 		color: 'black',
+	// 		fillOpacity: 0.8,
+	// 		fillColor: 'yellow'
+	// 	}
+	// }).addTo(map);
 
 	map.attributionControl.addAttribution('Alcohol data &copy; <a href="#">ABC</a>');
 }
 
+var setupUi = function(){
+	$(".map-type").click(function(){
+		changeView($(this).attr('id'));
+	});
+}
 
+setupUi();
 loadCSVs();
