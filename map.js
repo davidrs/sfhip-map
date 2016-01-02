@@ -163,10 +163,12 @@ var getDelta = function(censusTract, label){
 
 // Load geojson of SanFrancisco census tracts.
 var loadGeoJson = function(){
-	geojson = L.geoJson(sfTracts, {
-		style: style,
-		onEachFeature: onEachFeature
-	}).addTo(map);
+	d3.json("data/sfTracts.json", function(err, sfTracts){
+		geojson = L.geoJson(sfTracts, {
+			style: style,
+			onEachFeature: onEachFeature
+		}).addTo(map);
+	});
 
 	map.attributionControl.addAttribution('TODO. find source &copy; <a href="#">source</a>');
 }
@@ -174,15 +176,17 @@ var loadGeoJson = function(){
 // Load geojson for the Safe Passage area in the tenderloin. 
 // !!Currently unused.
 var loadSafePassage = function(){
-	safePassageGeojson = L.geoJson(safePassage, {
-		style: {
-			weight: 1,
-			opacity: 1,
-			color: 'black',
-			fillOpacity: 0.8,
-			fillColor: 'yellow'
-		}
-	}).addTo(map);
+	d3.json("data/safePassage.json", function(err, safePassage){
+		safePassageGeojson = L.geoJson(safePassage, {
+			style: {
+				weight: 1,
+				opacity: 1,
+				color: 'black',
+				fillOpacity: 0.8,
+				fillColor: 'yellow'
+			}
+		}).addTo(map);
+	});
 };
 
 var setupUiListeners = function(){
