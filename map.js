@@ -14,6 +14,17 @@ var OFFSITE_LABEL = "offSite";
 var ONSITE_LABEL = "onSite";
 var currentView = OFFSITE_LABEL;
 
+var views = {};
+views[OFFSITE_LABEL] = {
+	title: 'Off-Sale Alcohol Licenses',
+
+};
+views[ONSITE_LABEL] = {
+	title: 'On-Sale Alcohol Licenses (Type 40,41 and 48)',
+
+};
+
+
 // Leaflet map object.
 var map;
 
@@ -210,7 +221,7 @@ var setupLegend = function(){
 			to = grades[i + 1];
 
 			labels.push(
-				'<i style="background:' + getColor(from+ 0.001) + '"></i> ' +
+				'<i style="background:' + getColor(from + 0.001) + '"></i> ' +
 				prettyRound(from) + (from == 1 ? '': (to ? '&ndash;' + prettyRound(to) : '+'))+'%');
 		}
 	 	div.innerHTML = "<strong>actual licenses / approved #</strong><br />"
@@ -239,7 +250,7 @@ var setupInfoBox = function(){
 		if(currentView == ONSITE_LABEL) {
 			label = "onSite";
 		}
-		this._div.innerHTML = '<h4>'+label+' Aclohol Licenses</h4>' +  (props ?
+		this._div.innerHTML = '<h4>'+ views[label].title +'</h4>' +  (props ?
 			'<b>Census Tract: ' + tract + '</b><br />' 
 			+ '<b>' + prettyRound(getRatio(tract, label)) + '% of authorized #</b><br />'
 			+ combinedData[tract][label].actual + ' actual #<br />'
