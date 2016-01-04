@@ -223,7 +223,7 @@ var setupLegend = function(){
 				'<i style="background:' + getColor(from + 0.001) + '"></i> ' +
 				prettyRound(from) + (from == 1 ? '': (to ? '&ndash;' + prettyRound(to) : '+'))+'%');
 		}
-	 	div.innerHTML = "<strong>actual licenses / approved #</strong><br />"
+	 	div.innerHTML = "<strong>Actual Licenses / Approved #</strong><br />"
 		div.innerHTML += labels.join('<br>');
 		return div;
 	};
