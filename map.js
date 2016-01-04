@@ -6,22 +6,18 @@ var CENSUS_TRACT_COL = "censusTract";
 // Keyed off of census tract, has offSite.quota: #, offSite.actual#:
 var combinedData = {};
 
-// TODO: variable for on site license codes: 20 and 21
-// TODO: variable for off site license codes: 48, 41, 40
-
-// TODO: variable for off site license codes
 var OFFSITE_LABEL = "offSite";
 var ONSITE_LABEL = "onSite";
 var currentView = OFFSITE_LABEL;
 
+// TODO: variable for on site license codes: 20 and 21
+// TODO: variable for off site license codes: 48, 41, 40
 var views = {};
 views[OFFSITE_LABEL] = {
 	title: 'Off-Sale Alcohol Licenses',
-
 };
 views[ONSITE_LABEL] = {
 	title: 'On-Sale Alcohol Licenses (Type 40,41 and 48)',
-
 };
 
 
@@ -34,13 +30,22 @@ var legend;
 // Leaflet info box.
 var info;
 
+// GeoJson leaflet layer for the census tracts.
+var geojson;
+
 var changeView = function(label){
 	currentView = label;
 	geojson.setStyle(style);
+
+	if (label == ONSITE_LABEL) {
+		showStores();
+	} else {
+		hideStores();
+	}
 }
 
 var loadCSVs = function(){
-	allowedLicenseCounts = d3.csv(ALLOWED_LICENSES_CSV, function(rows){
+	d3.csv(ALLOWED_LICENSES_CSV, function(rows){
 		rows.forEach(function(d){
 			censusTract = Math.round(+d[CENSUS_TRACT_COL] * 100)
 			if (!combinedData[censusTract]){
@@ -49,7 +54,7 @@ var loadCSVs = function(){
 			combinedData[censusTract].offSite.quota = +d["Off Sale"];
 			combinedData[censusTract].onSite.quota = +d["On Sale"];
 		});
-		actualLicenseCounts = d3.csv(ACTUAL_LICENSES_CSV, function(rows){
+		d3.csv(ACTUAL_LICENSES_CSV, function(rows){
 			rows.forEach(function(d){
 				if (!combinedData[d[CENSUS_TRACT_COL]]){
 					combinedData[d[CENSUS_TRACT_COL]] = {onSite:{}, offSite:{}};
@@ -105,7 +110,6 @@ var style = function(feature) {
 	};
 }
 
-
 var highlightFeature = function(e) {
 	var layer = e.target;
 
@@ -122,8 +126,6 @@ var highlightFeature = function(e) {
 
 	info.update(layer.feature.properties);
 }
-
-var geojson;
 
 var resetHighlight = function(e) {
 	geojson.resetStyle(e.target);
@@ -160,7 +162,6 @@ var getDelta = function(censusTract, label){
 	return (combinedData[censusTract][label].quota - combinedData[censusTract][label].actual);
 }
 
-
 // Load geojson of SanFrancisco census tracts.
 var loadGeoJson = function(){
 	d3.json("data/sfTracts.json", function(err, sfTracts){
@@ -179,19 +180,13 @@ var loadSafePassage = function(){
 	d3.json("data/safePassage.json", function(err, safePassage){
 		safePassageGeojson = L.geoJson(safePassage, {
 			style: {
-				weight: 1,
+				weight: 1,	
 				opacity: 1,
 				color: 'black',
 				fillOpacity: 0.8,
 				fillColor: 'yellow'
 			}
 		}).addTo(map);
-	});
-};
-
-var setupUiListeners = function(){
-	$(".map-type").click(function(){
-		changeView($(this).attr('id'));
 	});
 };
 
@@ -256,15 +251,12 @@ var setupInfoBox = function(){
 		}
 		this._div.innerHTML = '<h4>'+ views[label].title +'</h4>' +  (props ?
 			'<b>Census Tract: ' + tract + '</b><br />' 
-			+ '<b>' + prettyRound(getRatio(tract, label)) + '% of authorized #</b><br />'
-			+ combinedData[tract][label].actual + ' actual #<br />'
-			+ combinedData[tract][label].quota + ' authorized #<br />'
-			+ getDelta(tract,label) + ' quota - actual<br />'
+			+ '<b>' + prettyRound(getRatio(tract, label)) + '% of Authorized #</b><br />'
+			+ combinedData[tract][label].actual + ' Actual #<br />'
+			+ combinedData[tract][label].quota + ' Authorized #<br />'
+			+ getDelta(tract,label) + ' Authorized - Actual<br />'
 			: 'Hover over an area');
 	};
 	info.addTo(map);
 }
 
-// Start the app.
-setupUiListeners();
-setupMap();
