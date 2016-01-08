@@ -1,5 +1,6 @@
 var ALLOWED_LICENSES_CSV = "data/allowed.csv";
 var ACTUAL_LICENSES_CSV = "data/actual.csv";
+var DISTRICTS_CSV = "data/neighborhood_district.csv";
 
 var CENSUS_TRACT_COL = "censusTract";
 
@@ -14,7 +15,7 @@ var currentView = OFFSITE_LABEL;
 // TODO: variable for off site license codes: 48, 41, 40
 var views = {};
 views[OFFSITE_LABEL] = {
-	title: 'Off-Sale Alcohol Licenses',
+	title: 'Off-Sale Alcohol Licenses (Type 20 and 21)',
 };
 views[ONSITE_LABEL] = {
 	title: 'On-Sale Alcohol Licenses (Type 40,41 and 48)',
@@ -81,7 +82,16 @@ var loadCSVs = function(){
 					combinedData[d[CENSUS_TRACT_COL]].onSite.actual = 0;
 				}
 			});
-			loadGeoJson();
+			d3.csv(DISTRICTS_CSV, function(rows){
+				rows.forEach(function(d){
+					if (!combinedData[d[CENSUS_TRACT_COL]]){
+						combinedData[d[CENSUS_TRACT_COL]] = {onSite:{}, offSite:{}};
+					}
+					combinedData[d[CENSUS_TRACT_COL]].neighborhood = d.neighborhood;
+					combinedData[d[CENSUS_TRACT_COL]].superVisorDistrict = d.superVisorDistrict;				
+				});
+				loadGeoJson();
+			});
 		});
 	});
 }
@@ -89,8 +99,8 @@ var loadCSVs = function(){
 
 // Determines colour of map polygons.
 var getColor = function(d) {
-	return d > 1.5 ? '#800026' :
-	       d >= 1.01  ? '#FC4E2A' :
+	return d > 1.5 ? '#800012' :
+	       d >= 1.01  ? '#FC532A' :
 	       d >= 1.0  ? '#FDFD3C' :
 	       d > 0.5   ? '#D9FE76' :
 	       d >= 0.0   ? '#B2FE4C' :
@@ -223,7 +233,7 @@ var setupLegend = function(){
 				'<i style="background:' + getColor(from + 0.001) + '"></i> ' +
 				prettyRound(from) + (from == 1 ? '': (to ? '&ndash;' + prettyRound(to) : '+'))+'%');
 		}
-	 	div.innerHTML = "<strong>Actual Licenses / Approved #</strong><br />"
+	 	div.innerHTML = "<strong>Actual Licenses / Authorized #</strong><br />"
 		div.innerHTML += labels.join('<br>');
 		return div;
 	};
@@ -249,8 +259,11 @@ var setupInfoBox = function(){
 		if(currentView == ONSITE_LABEL) {
 			label = "onSite";
 		}
+		console.log(combinedData[tract]);
 		this._div.innerHTML = '<h4>'+ views[label].title +'</h4>' +  (props ?
 			'<b>Census Tract: ' + tract + '</b><br />' 
+			+ 'Neighborhood: ' + combinedData[tract].neighborhood +'<br />'
+			+ 'Supervisor District: ' + combinedData[tract].superVisorDistrict +'<br /><hr/>'
 			+ '<b>' + prettyRound(getRatio(tract, label)) + '% of Authorized #</b><br />'
 			+ combinedData[tract][label].actual + ' Actual #<br />'
 			+ combinedData[tract][label].quota + ' Authorized #<br />'
