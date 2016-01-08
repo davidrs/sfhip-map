@@ -45,6 +45,7 @@ var changeView = function(label){
 	}
 }
 
+
 var loadCSVs = function(){
 	d3.csv(ALLOWED_LICENSES_CSV, function(rows){
 		rows.forEach(function(d){
@@ -54,6 +55,14 @@ var loadCSVs = function(){
 			}
 			combinedData[censusTract].offSite.quota = +d["Off Sale"];
 			combinedData[censusTract].onSite.quota = +d["On Sale"];
+
+			// We have data for the tract, so set values to 0 instead of undefined.
+			if (!combinedData[censusTract].offSite.quota){
+				combinedData[censusTract].offSite.quota = 0;
+			}
+			if (!combinedData[censusTract].onSite.quota){
+				combinedData[censusTract].onSite.quota = 0;
+			}
 		});
 		d3.csv(ACTUAL_LICENSES_CSV, function(rows){
 			rows.forEach(function(d){
@@ -259,7 +268,6 @@ var setupInfoBox = function(){
 		if(currentView == ONSITE_LABEL) {
 			label = "onSite";
 		}
-		console.log(combinedData[tract]);
 		this._div.innerHTML = '<h4>'+ views[label].title +'</h4>' +  (props ?
 			'<b>Census Tract: ' + tract + '</b><br />' 
 			+ 'Neighborhood: ' + combinedData[tract].neighborhood +'<br />'
