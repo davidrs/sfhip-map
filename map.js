@@ -37,12 +37,6 @@ var geojson;
 var changeView = function(label){
 	currentView = label;
 	geojson.setStyle(style);
-
-	if (label == ONSITE_LABEL) {
-		showStores();
-	} else {
-		hideStores();
-	}
 }
 
 
