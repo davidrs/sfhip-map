@@ -33,9 +33,15 @@
 	cursor: pointer;
 	padding: 4px 8px;
 	background-color: #eee;
+	color: #333;
 	border-radius: 2px;
 	float:left;
 	margin-right: 5px;
 	font-family: Roboto;
 	font-size: 15px;
+}
+
+.active {
+	background-color: #d1d1d1;
+	color:#000;
 }
