@@ -34,11 +34,32 @@ var info;
 // GeoJson leaflet layer for the census tracts.
 var geojson;
 
+// Setup the leaflet map and legend;
+var setupMap = function(){
+	map = L.map('map').setView([37.75, -122.43], 12);
+
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6IjZjNmRjNzk3ZmE2MTcwOTEwMGY0MzU3YjUzOWFmNWZhIn0.Y8bhBaUMqFiPrDRW9hieoQ', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		id: 'mapbox.light'
+	}).addTo(map);
+
+	setupLegend();	
+	setupInfoBox();	
+	loadCSVs();
+
+	drawCrimePrecincts();
+	new L.Control.GeoSearch({
+	    provider: new L.GeoSearch.Provider.OpenStreetMap()
+	}).addTo(map);
+};
+
 var changeView = function(label){
 	currentView = label;
 	geojson.setStyle(style);
 }
-
 
 var loadCSVs = function(){
 	d3.csv(ALLOWED_LICENSES_CSV, function(rows){
@@ -203,22 +224,6 @@ var loadSafePassage = function(){
 	});
 };
 
-// Setup the leaflet map and legend;
-var setupMap = function(){
-	map = L.map('map').setView([37.75, -122.43], 12);
-
-	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6IjZjNmRjNzk3ZmE2MTcwOTEwMGY0MzU3YjUzOWFmNWZhIn0.Y8bhBaUMqFiPrDRW9hieoQ', {
-		maxZoom: 18,
-		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-		id: 'mapbox.light'
-	}).addTo(map);
-
-	setupLegend();	
-	setupInfoBox();	
-	loadCSVs();
-};
 
 var setupLegend = function(){
 	legend = L.control({position: 'bottomright'});

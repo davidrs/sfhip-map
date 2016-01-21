@@ -29,6 +29,14 @@
 	opacity: 0.7;
 }
 
+.leaflet-control-geosearch {
+	left:42px;
+}
+.leaflet-control-geosearch input{
+	font-size: 16px;
+}
+
+
 .tab{
 	cursor: pointer;
 	padding: 4px 8px;
