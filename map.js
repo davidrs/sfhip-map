@@ -18,7 +18,7 @@ views[OFFSITE_LABEL] = {
 	title: 'Off-Sale Alcohol Licenses (Type 20 and 21)',
 };
 views[ONSITE_LABEL] = {
-	title: 'On-Sale Alcohol Licenses (Type 40,41 and 48)',
+	title: 'On-Sale Alcohol Licenses (Type 40,41, 42, 47 and 48)',
 };
 
 
@@ -90,7 +90,7 @@ var loadCSVs = function(){
 					} else {
 						combinedData[d[CENSUS_TRACT_COL]].offSite.actual += +d["n_stores"];
 					}
-				} else if (d["License_Ty"] == "40" || d["License_Ty"] == "41" || d["License_Ty"] == "48"){ // On site licenses, type 48.
+				} else if (d["License_Ty"] == "40" || d["License_Ty"] == "41" || d["License_Ty"] == "42" || d["License_Ty"] == "47" || d["License_Ty"] == "48"){ // On site licenses, type 48.
 					if (!combinedData[d[CENSUS_TRACT_COL]].onSite.actual){
 						combinedData[d[CENSUS_TRACT_COL]].onSite.actual = +d["n_stores"];
 					} else {
@@ -135,7 +135,7 @@ var getColor = function(d) {
 var style = function(feature) {
 	var censusTract= +feature.properties.TRACT;
 	return {
-		weight: 2,
+		weight: 1,
 		opacity: 1,
 		color: 'white',
 		dashArray: '3',
