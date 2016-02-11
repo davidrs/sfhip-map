@@ -7,6 +7,9 @@ var CENSUS_TRACT_COL = "censusTract";
 // Keyed off of census tract, has offSite.quota: #, offSite.actual#:
 var combinedData = {};
 
+// Data to be shown on the map.
+var mapData = combinedData;
+
 var OFFSITE_LABEL = "offSite";
 var ONSITE_LABEL = "onSite";
 var currentView = OFFSITE_LABEL;
@@ -31,6 +34,8 @@ var legend;
 // Leaflet info box.
 var info;
 
+var rawTractsGeoJson = {};
+
 // GeoJson leaflet layer for the census tracts.
 var geojson;
 
@@ -50,7 +55,6 @@ var setupMap = function(){
 	setupInfoBox();	
 	loadCSVs();
 
-	drawCrimePrecincts();
 	new L.Control.GeoSearch({
 	    provider: new L.GeoSearch.Provider.OpenStreetMap()
 	}).addTo(map);
@@ -59,6 +63,7 @@ var setupMap = function(){
 var changeView = function(label){
 	currentView = label;
 	geojson.setStyle(style);
+	tenderloinLayer.setStyle(style);
 }
 
 var loadCSVs = function(){
@@ -203,6 +208,17 @@ var loadGeoJson = function(){
 			style: style,
 			onEachFeature: onEachFeature
 		}).addTo(map);
+
+		tenderloinLayer = L.geoJson(sfTracts, {
+			style: style,
+			onEachFeature: onEachFeature
+		});
+
+		tenderloinLayer.getLayers().forEach(function(layer){
+			if (layer.feature.properties.censusTract <  12201 || layer.feature.properties.censusTract > 12502){
+				tenderloinLayer.removeLayer(layer);
+			}
+		})
 	});
 
 	map.attributionControl.addAttribution('TODO. find source &copy; <a href="#">source</a>');

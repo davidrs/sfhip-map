@@ -1,8 +1,5 @@
 // File for all code about loading the stores.
 
-//
-
-
 // Array of starbucks, and tacobells.
 var stores = [];
 

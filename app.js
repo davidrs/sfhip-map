@@ -2,6 +2,8 @@
 var start = function(){
 	setupUiListeners();
 	setupMap();
+	loadCrimePrecincts();
+	loadNeighbourHoods();
 };
 
 
@@ -17,6 +19,15 @@ var setupUiListeners = function(){
 		showStores();
 		$(".tab").removeClass("active");
 		$(this).addClass("active");
+	});
+	$("#toggleTenderloin").click(function(){
+		toggleTenderloin();
+	});
+	$("#toggleCrime").click(function(){
+		toggleCrime();
+	});
+	$("#toggleNeighbourhood").click(function(){
+		toggleNeighbourhood();
 	});
 };
 
