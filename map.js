@@ -1,4 +1,4 @@
-var LICENSES_CSV = "data/abc_021316.csv";
+var LICENSES_CSV = "data/abc_map_2016.csv";
 var DISTRICTS_CSV = "data/neighborhood_district.csv";
 
 var CENSUS_TRACT_COL = "CTract";
