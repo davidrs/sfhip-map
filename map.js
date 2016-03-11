@@ -74,10 +74,10 @@ var loadCSVs = function(){
 				combinedData[censusTract] = {onSite:{quota:null, actual:null}, offSite:{quota:null, actual:null}};
 			} 
 			//OnSale_actual,OffSale_actual,OnSale_auth,OffSale_auth
-			combinedData[censusTract].offSite.quota = +d["OffSale_auth"];
-			combinedData[censusTract].onSite.quota = +d["OnSale_auth"];
-			combinedData[censusTract].offSite.actual = +d["OffSale_actual"];
-			combinedData[censusTract].onSite.actual = +d["OnSale_actual"];
+			combinedData[censusTract].offSite.quota = +d["OffSale"];
+			combinedData[censusTract].onSite.quota = +d["OnSale"];
+			combinedData[censusTract].offSite.actual = +d["OffSale_auth"]; ///  ABC calls actual auth. that's why this is confusing.
+			combinedData[censusTract].onSite.actual = +d["OnSale_auth"];
 			console.log('d', d);
 			console.log(combinedData);
 		});

@@ -1,4 +1,4 @@
-County,Population,OnSale_Ratio,OffSale_Ratio,CTract,Map_tracts,Ctract_Pop,OnSale_actual,OffSale_actual,OnSale_auth,OffSale_auth,excess_offsale,excess_onsale
+County,Population,OnSale_Ratio,OffSale_Ratio,CTract,Map_tracts,Ctract_Pop,OnSale,OffSale,OnSale_auth,OffSale_auth,excess_offsale,excess_onsale
 SAN FRANCISCO,845602,275,1060,101,10100,3739,13,3,49,13,10,36
 SAN FRANCISCO,845602,275,1060,102,10200,4143,15,3,17,5,2,2
 SAN FRANCISCO,845602,275,1060,103,10300,3852,14,3,6,0,-3,-8
