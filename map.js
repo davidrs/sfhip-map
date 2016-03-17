@@ -99,9 +99,9 @@ var loadCSVs = function(){
 var getColor = function(d) {
 	return d > 1.5 ? '#800012' :
 	       d >= 1.01  ? '#FC532A' :
-	       d >= 1.0  ? '#FDFD3C' :
+	       d >= 1.0  ? '#ffcc00' :
 	       d > 0.5   ? '#D9FE76' :
-	       d >= 0.0   ? '#B2FE4C' :
+	       d >= 0.0   ? '#B2FE3C' :
 	                  '#EEE';
 }
 
