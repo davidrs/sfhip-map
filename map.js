@@ -1,8 +1,7 @@
-var ALLOWED_LICENSES_CSV = "data/allowed.csv";
-var ACTUAL_LICENSES_CSV = "data/actual.csv";
+var LICENSES_CSV = "data/abc_map_2016.csv";
 var DISTRICTS_CSV = "data/neighborhood_district.csv";
 
-var CENSUS_TRACT_COL = "censusTract";
+var CENSUS_TRACT_COL = "CTract";
 
 // Keyed off of census tract, has offSite.quota: #, offSite.actual#:
 var combinedData = {};
@@ -67,60 +66,30 @@ var changeView = function(label){
 }
 
 var loadCSVs = function(){
-	d3.csv(ALLOWED_LICENSES_CSV, function(rows){
+	d3.csv(LICENSES_CSV, function(rows){
 		rows.forEach(function(d){
+			//quota
 			censusTract = Math.round(+d[CENSUS_TRACT_COL] * 100)
 			if (!combinedData[censusTract]){
-				combinedData[censusTract] = {onSite:{}, offSite:{}};
-			}
-			combinedData[censusTract].offSite.quota = +d["Off Sale"];
-			combinedData[censusTract].onSite.quota = +d["On Sale"];
-
-			// We have data for the tract, so set values to 0 instead of undefined.
-			if (!combinedData[censusTract].offSite.quota){
-				combinedData[censusTract].offSite.quota = 0;
-			}
-			if (!combinedData[censusTract].onSite.quota){
-				combinedData[censusTract].onSite.quota = 0;
-			}
+				combinedData[censusTract] = {onSite:{quota:null, actual:null}, offSite:{quota:null, actual:null}};
+			} 
+			//OnSale_actual,OffSale_actual,OnSale_auth,OffSale_auth
+			combinedData[censusTract].offSite.quota = +d["OffSale"];
+			combinedData[censusTract].onSite.quota = +d["OnSale"];
+			combinedData[censusTract].offSite.actual = +d["OffSale_auth"]; ///  ABC calls actual auth. that's why this is confusing.
+			combinedData[censusTract].onSite.actual = +d["OnSale_auth"];
+			console.log('d', d);
+			console.log(combinedData);
 		});
-		d3.csv(ACTUAL_LICENSES_CSV, function(rows){
+		d3.csv(DISTRICTS_CSV, function(rows){
 			rows.forEach(function(d){
 				if (!combinedData[d[CENSUS_TRACT_COL]]){
 					combinedData[d[CENSUS_TRACT_COL]] = {onSite:{}, offSite:{}};
 				}
-				if (d["License_Ty"] == "20" || d["License_Ty"] == "21"){
-					if (!combinedData[d[CENSUS_TRACT_COL]].offSite.actual){
-						combinedData[d[CENSUS_TRACT_COL]].offSite.actual = +d["n_stores"];
-					} else {
-						combinedData[d[CENSUS_TRACT_COL]].offSite.actual += +d["n_stores"];
-					}
-				} else if (d["License_Ty"] == "40" || d["License_Ty"] == "41" || d["License_Ty"] == "42" || d["License_Ty"] == "47" || d["License_Ty"] == "48"){ // On site licenses, type 48.
-					if (!combinedData[d[CENSUS_TRACT_COL]].onSite.actual){
-						combinedData[d[CENSUS_TRACT_COL]].onSite.actual = +d["n_stores"];
-					} else {
-						combinedData[d[CENSUS_TRACT_COL]].onSite.actual += +d["n_stores"];
-					}
-				}
-
-				// We have data for the tract, so set values to 0 instead of undefined.
-				if (!combinedData[d[CENSUS_TRACT_COL]].offSite.actual){
-					combinedData[d[CENSUS_TRACT_COL]].offSite.actual = 0;
-				}
-				if (!combinedData[d[CENSUS_TRACT_COL]].onSite.actual){
-					combinedData[d[CENSUS_TRACT_COL]].onSite.actual = 0;
-				}
+				combinedData[d[CENSUS_TRACT_COL]].neighborhood = d.neighborhood;
+				combinedData[d[CENSUS_TRACT_COL]].superVisorDistrict = d.superVisorDistrict;				
 			});
-			d3.csv(DISTRICTS_CSV, function(rows){
-				rows.forEach(function(d){
-					if (!combinedData[d[CENSUS_TRACT_COL]]){
-						combinedData[d[CENSUS_TRACT_COL]] = {onSite:{}, offSite:{}};
-					}
-					combinedData[d[CENSUS_TRACT_COL]].neighborhood = d.neighborhood;
-					combinedData[d[CENSUS_TRACT_COL]].superVisorDistrict = d.superVisorDistrict;				
-				});
-				loadGeoJson();
-			});
+			loadGeoJson();
 		});
 	});
 }
@@ -130,9 +99,9 @@ var loadCSVs = function(){
 var getColor = function(d) {
 	return d > 1.5 ? '#800012' :
 	       d >= 1.01  ? '#FC532A' :
-	       d >= 1.0  ? '#FDFD3C' :
+	       d >= 1.0  ? '#ffcc00' :
 	       d > 0.5   ? '#D9FE76' :
-	       d >= 0.0   ? '#B2FE4C' :
+	       d >= 0.0   ? '#B2FE3C' :
 	                  '#EEE';
 }
 
