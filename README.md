@@ -1,4 +1,4 @@
-Demo: http://rawgit.com/davidrs/sfhip-map/master/index.html
+Demo: http://davidrs.github.io/sfhip-map/
 
 Code was written for SFHIP at Code for SF hack nights.
 
