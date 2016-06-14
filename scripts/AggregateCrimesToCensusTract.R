@@ -33,9 +33,8 @@ crimeSpatDF <- as.data.frame(crimeDF)
 coordinates(crimeSpatDF) <- ~X+Y
 
 # Read in tracts data from GeoJSON
-tractsFile <- tempfile()
-download.file('https://raw.githubusercontent.com/davidrs/sfhip-map/master/data/sfTracts.json', tractsFile)
-tractsJSON <- rgdal::readOGR(tractsFile, "OGRGeoJSON")
+download.file('https://raw.githubusercontent.com/davidrs/sfhip-map/master/data/sfTracts.json', "sfTracts.json", method = "curl")
+tractsJSON <- rgdal::readOGR("sfTracts.json", "OGRGeoJSON")
 
 # Make sure projections for DFs are the same
 sp::proj4string(crimeSpatDF) <- sp::proj4string(tractsJSON)
