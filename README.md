@@ -3,6 +3,15 @@ Demo: http://davidrs.github.io/sfhip-map/
 Code was written for SFHIP at Code for SF hack nights.
 
 
+## Running the Code Locally
+
+1. Clone the repo.
+2. On the command line ```cd``` into the folder you cloned the code to.
+3. From the command line run ```python -m SimpleHTTPServer```
+4. You should see a message like: ```Serving HTTP on 0.0.0.0 port 8000 ...```
+5. Open this website in chrome: http://localhost:8000
+
+
 ## Data
 
 Data is from SFHIP  google drive folders, 
