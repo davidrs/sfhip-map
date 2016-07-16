@@ -3,6 +3,9 @@ var DISTRICTS_CSV = "data/neighborhood_district.csv";
 
 var CENSUS_TRACT_COL = "CTract";
 
+//Neighborhood.csv uses a different column header name for census tract
+var CENSUS_TRACT_COL_NEIGHBORHOODS = "censusTract";
+
 // Keyed off of census tract, has offSite.quota: #, offSite.actual#:
 var combinedData = {};
 
@@ -83,11 +86,11 @@ var loadCSVs = function(){
 		});
 		d3.csv(DISTRICTS_CSV, function(rows){
 			rows.forEach(function(d){
-				if (!combinedData[d[CENSUS_TRACT_COL]]){
-					combinedData[d[CENSUS_TRACT_COL]] = {onSite:{}, offSite:{}};
+				if (!combinedData[d[CENSUS_TRACT_COL_NEIGHBORHOODS]]){
+					combinedData[d[CENSUS_TRACT_COL_NEIGHBORHOODS]] = {onSite:{}, offSite:{}};
 				}
-				combinedData[d[CENSUS_TRACT_COL]].neighborhood = d.neighborhood;
-				combinedData[d[CENSUS_TRACT_COL]].superVisorDistrict = d.superVisorDistrict;				
+				combinedData[d[CENSUS_TRACT_COL_NEIGHBORHOODS]].neighborhood = d.neighborhood;
+				combinedData[d[CENSUS_TRACT_COL_NEIGHBORHOODS]].superVisorDistrict = d.superVisorDistrict;				
 			});
 			loadGeoJson();
 		});
