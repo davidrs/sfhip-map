@@ -66,6 +66,8 @@ var changeView = function(label){
 	currentView = label;
 	geojson.setStyle(style);
 	tenderloinLayer.setStyle(style);
+	info.update();
+
 }
 
 var loadCSVs = function(){
@@ -247,23 +249,24 @@ var setupInfoBox = function(){
 	};
 
 	info.update = function (props) {
-		if (!props || !props.censusTract){
-			return;
-		}
-		var tract = props.censusTract;
 		var label = "offSite";
 		if(currentView == ONSITE_LABEL) {
 			label = "onSite";
 		}
-		this._div.innerHTML = '<h4>'+ views[label].title +'</h4>' +  (props ?
+		if (!props || !props.censusTract){
+			this._div.innerHTML = '<h4>'+ views[label].title +'</h4>' + 'Hover over an area';
+			return;
+		}
+		var tract = props.censusTract;
+		
+		this._div.innerHTML = '<h4>'+ views[label].title +'</h4>' +
 			'<b>Census Tract: ' + tract + '</b><br />' 
 			+ 'Neighborhood: ' + combinedData[tract].neighborhood +'<br />'
 			+ 'Supervisor District: ' + combinedData[tract].superVisorDistrict +'<br /><hr/>'
 			+ '<b>' + prettyRound(getRatio(tract, label)) + '% of Authorized #</b><br />'
 			+ combinedData[tract][label].actual + ' Actual #<br />'
 			+ combinedData[tract][label].quota + ' Authorized #<br />'
-			+ getDelta(tract,label) + ' Authorized - Actual<br />'
-			: 'Hover over an area');
+			+ getDelta(tract,label) + ' Authorized - Actual<br />';
 	};
 	info.addTo(map);
 }
