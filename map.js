@@ -3,6 +3,9 @@ var DISTRICTS_CSV = "data/neighborhood_district.csv";
 
 var CENSUS_TRACT_COL = "CTract";
 
+//Neighborhood.csv uses a different column header name for census tract
+var CENSUS_TRACT_COL_NEIGHBORHOODS = "censusTract";
+
 // Keyed off of census tract, has offSite.quota: #, offSite.actual#:
 var combinedData = {};
 
@@ -63,6 +66,8 @@ var changeView = function(label){
 	currentView = label;
 	geojson.setStyle(style);
 	tenderloinLayer.setStyle(style);
+	info.update();
+
 }
 
 var loadCSVs = function(){
@@ -83,11 +88,11 @@ var loadCSVs = function(){
 		});
 		d3.csv(DISTRICTS_CSV, function(rows){
 			rows.forEach(function(d){
-				if (!combinedData[d[CENSUS_TRACT_COL]]){
-					combinedData[d[CENSUS_TRACT_COL]] = {onSite:{}, offSite:{}};
+				if (!combinedData[d[CENSUS_TRACT_COL_NEIGHBORHOODS]]){
+					combinedData[d[CENSUS_TRACT_COL_NEIGHBORHOODS]] = {onSite:{}, offSite:{}};
 				}
-				combinedData[d[CENSUS_TRACT_COL]].neighborhood = d.neighborhood;
-				combinedData[d[CENSUS_TRACT_COL]].superVisorDistrict = d.superVisorDistrict;				
+				combinedData[d[CENSUS_TRACT_COL_NEIGHBORHOODS]].neighborhood = d.neighborhood;
+				combinedData[d[CENSUS_TRACT_COL_NEIGHBORHOODS]].superVisorDistrict = d.superVisorDistrict;				
 			});
 			loadGeoJson();
 		});
@@ -244,23 +249,24 @@ var setupInfoBox = function(){
 	};
 
 	info.update = function (props) {
-		if (!props || !props.censusTract){
-			return;
-		}
-		var tract = props.censusTract;
 		var label = "offSite";
 		if(currentView == ONSITE_LABEL) {
 			label = "onSite";
 		}
-		this._div.innerHTML = '<h4>'+ views[label].title +'</h4>' +  (props ?
+		if (!props || !props.censusTract){
+			this._div.innerHTML = '<h4>'+ views[label].title +'</h4>' + 'Hover over an area';
+			return;
+		}
+		var tract = props.censusTract;
+		
+		this._div.innerHTML = '<h4>'+ views[label].title +'</h4>' +
 			'<b>Census Tract: ' + tract + '</b><br />' 
 			+ 'Neighborhood: ' + combinedData[tract].neighborhood +'<br />'
 			+ 'Supervisor District: ' + combinedData[tract].superVisorDistrict +'<br /><hr/>'
 			+ '<b>' + prettyRound(getRatio(tract, label)) + '% of Authorized #</b><br />'
 			+ combinedData[tract][label].actual + ' Actual #<br />'
 			+ combinedData[tract][label].quota + ' Authorized #<br />'
-			+ getDelta(tract,label) + ' Authorized - Actual<br />'
-			: 'Hover over an area');
+			+ getDelta(tract,label) + ' Authorized - Actual<br />';
 	};
 	info.addTo(map);
 }
